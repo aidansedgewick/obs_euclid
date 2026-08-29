@@ -1,0 +1,16 @@
+[project]
+name = "obs_euclid"
+version = "0.1.0"
+description = "Euclid obs package for LSST Gen3 butler"
+
+[tool.setuptools.packages.find]
+where = ["python"]
+
+[tool.setuptools.package-data]
+"lsst.obs.euclid" = [
+    "config/*.yaml",
+    "policy/*",
+]
+
+[project.entry-points."lsst.obs.instrument"]
+EuclidInstrument = "lsst.obs.euclid.instrument:EuclidInstrument"
