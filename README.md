@@ -184,6 +184,7 @@ You can make basic queries with Butler.query_datasets().
 >>> print(im.wcs) # wcs to make transforms
 >>> print(im.image.array) # pixel data
 ```
+and similar for dataset types `euclidBgMod`, `euclidRmsMap`, `euclidFlagMap`, `euclidGridPsf`, `euclidSegMap`
 
 Because the skymap is made of tracts, you can do spatial queries:
 ```
@@ -199,8 +200,14 @@ Because the skymap is made of tracts, you can do spatial queries:
 
 ## Issues
 
-- non-standard tract size means that tract WCS does not exactly match with loaded image WCS.
+- non-standard tile sizes means that tract WCS does not exactly match with loaded image WCS.
+  - Currently all tracts are defined as 21600x21600 pixels, but the centre of each tract is 
+    still the centre of the FITS image (usually 19200//2, not 21600//2).
   - currently you have to take cutouts from the full loaded image, 
     rather than requesting a windowed read (that is, you can't currently provide 'bbox to `Butler.get()`).
+
+  - The solution is maybe to define the RA, Dec centres of tracts as 21600//2 instead of 19200//2
+    in `lsst.obs.euclid.skymaps`
+
 - catalog-psf tables are not ingested correctly.
 - Ingesting images segmaps without physically writing to disk - would give faster ingest.

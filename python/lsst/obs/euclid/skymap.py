@@ -26,6 +26,14 @@ def build_euclid_q1_skymap_config_from_tiles(
     # Capturing groups tile_id and rng_id: ...TILE<tile_id>-<rng_id>_...
     pattern = re.compile(".*_TILE([0-9]*)-([a-zA-Z0-9]*)_.*\.fits")
 
+    # Choose tract size as the largest euclid tile.
+    # Butler is flexible enough to handle this.
+    # tile 102041659 is shape (21600, 19200)
+    # tile 102160612 is shape (19200, 21600)
+
+    # TRACT_SIDE = 19200 # "normal" tile size.
+    TRACT_SIDE = 21600 # large enough to fit all tiles.
+
     for ii, filepath in enumerate(filelist):
 
         matches = pattern.search(filepath.name)
@@ -44,13 +52,15 @@ def build_euclid_q1_skymap_config_from_tiles(
 
             wcs = WCS(header)
             center_pix = (header["NAXIS1"] / 2.0, header["NAXIS2"] / 2.0)
+            # should the tract coords be the centre of the tract, or FITS image?
+            # center_pix = (TRACT_SIDE / 2.0, TRACT_SIDE / 2.0)
             center_coord: SkyCoord = wcs.pixel_to_world(*center_pix)
 
         tract_data[tile_id] = {"ra": center_coord.ra.deg, "dec": center_coord.dec.deg}
 
     logger.info(f"Build skymap with {len(tract_data)} tracts")
 
-    raList = []  # match LSST naming scheme here...
+    raList = []
     decList = []
     for tile_id in sorted(tract_data.keys()):
         raList.append(tract_data[tile_id]["ra"])
@@ -64,11 +74,7 @@ def build_euclid_q1_skymap_config_from_tiles(
     config.pixelScale = 0.1
     config.tractOverlap = 0.2 / 60.0
 
-    # Choose tract size as the largest euclid tile.
-    # Butler is flexible enough to handle this.
-    # tile 102041659 is shape (21600, 19200)
-    # tile 102160612 is shape (19200, 21600)
-    config.tractBuilder["legacy"].patchInnerDimensions = (21600, 21600)
+    config.tractBuilder["legacy"].patchInnerDimensions = (TRACT_SIDE, TRACT_SIDE)
     config.tractBuilder["legacy"].patchBorder = 100
     return config
 
