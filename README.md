@@ -9,8 +9,9 @@ You will need an installed copy of the lsst-stack.
 
 In your working dir `wkdir`, clone this repo:
 
-`git clone git@github.com:aidansedgewick/obs_euclid.git`
+`git clone https://github.com/aidansedgewick/obs_euclid.git`
 
+### LSST DM Stack
 You need an installed copy of the `lsst-scipipe` stack.
 
 If you don't have one, install it. You don't need root permissions.
@@ -29,10 +30,10 @@ Source & setup your new `lsst-scipipe`
 
 You can then install the new `obs_euclid` on top:
 - `cd <wkdir>/obs_euclid`
-- `python3 -m pip intstall -e .`
+- `python3 -m pip install -e .`
   - Install in editable mode, in case you need to change something.
 
-## Data layout.
+### Data layout
 
 The FITS file data are organised as they are downloaded from the IRSA servers
 https://irsa.ipac.caltech.edu/ibe/data/euclid/q1/
@@ -176,13 +177,13 @@ You can make basic queries with Butler.query_datasets().
 >>> from lsst.daf.butler import Butler
 >>> b = Butler("/path/to/repo")
 >>> coadd_refs = b.query_datasets(
-...    "euclidCoadd", where="band.name='J', limit=10, collections="Euclid/Q1"
+...    "euclidCoadd", where="band.name='J'", limit=10, collections="Euclid/Q1"
 ... )
 >>> print(coadd_refs[0])
 >>> print(coadd_refs[0].ospath)
 >>> im_data = b.get(coadd_refs[0])
->>> print(im.wcs) # wcs to make transforms
->>> print(im.image.array) # pixel data
+>>> print(im_data.wcs) # wcs to make transforms
+>>> print(im_data.image.array) # pixel data
 ```
 and similar for dataset types `euclidBgMod`, `euclidRmsMap`, `euclidFlagMap`, `euclidGridPsf`, `euclidSegMap`
 
